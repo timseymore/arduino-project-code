@@ -1,6 +1,18 @@
 #include "SR04.h"
 
 
+//  Set Caution Distance bounds
+//  - any distance within bounds (inclusive) is considered Caution
+//  - any distance less than min is considered Danger
+//  - any distance greater than max is considered Safe
+#define MIN 10
+#define MAX 25
+
+// Set robot movement speed
+// NOTE: positive integer up to 127, for double speed to be no greater than 255
+#define SPEED 127
+#define DOUBLE_SPEED SPEED*2  
+
 // SR04 Sensors
 #define TRIG_PIN_CENTER 12
 #define ECHO_PIN_CENTER 11
@@ -12,13 +24,6 @@
 // LEDs
 #define LEFT_LED 1
 #define RIGHT_LED 0
-
-// Caution Distance bounds
-//  - any distance greater than max is considered Safe
-//  - any distance less than min is considered Danger
-//  - any distance within bounds (inclusive) is considered Caution
-#define MAX 25
-#define MIN 10
 
 // Motors
 
@@ -32,9 +37,6 @@ int enB = 3;
 int in3 = 5;
 int in4 = 4;
 
-// Robot movement speed
-int speed;
-
 // Distance variables
 long front_distance;
 long right_distance;
@@ -46,10 +48,6 @@ SR04 right_sensor = SR04(ECHO_PIN_RIGHT, TRIG_PIN_RIGHT);
 SR04 left_sensor = SR04(ECHO_PIN_LEFT, TRIG_PIN_LEFT);
 
 void setup() {
-
-  // Set max speed here (1 - 255//2)
-  // NOTE: turn speed is speed*2 >= 255
-  speed = 80;  
 
   pinMode(enA, OUTPUT);
   pinMode(enB, OUTPUT);
@@ -130,39 +128,92 @@ void turnRight(int spd) {
   digitalWrite(in4, LOW);
 }
 
+// EFFECTS: Stops robot 
+void stop() {
+  // Motor A
+  analogWrite(enA, 0);
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);  
+  // Motor B
+  analogWrite(enB, 0);
+  digitalWrite(in3, LOW); 
+  digitalWrite(in4, LOW);
+}
 
 // EFFECTS: set direction based on distance to object
 void handle_object_distance(int front, int right, int left) {
+
+  bool danger_front = front < MIN;
+  bool caution_front = front <= MAX && front >= MIN;
+  bool safe_front = front > MAX;
+  bool danger_right = right < MIN;
+  bool caution_right = right <= MAX && right >= MIN;
+  bool safe_right = right > MAX;
+  bool danger_left = left < MIN;
+  bool caution_left = left <= MAX && left >= MIN;
+  bool safe_left = left > MAX;
+
   // Danger Any
-  if (front < MIN || right < MIN || left < MIN) {
-    moveReverse(speed*2);
+  if (danger_front || danger_right || danger_left) {
+    // stop, debug LEDs on,  and back up double speed
+    stop();
+    digitalWrite(RIGHT_LED, HIGH);
+    digitalWrite(LEFT_LED, HIGH);    
+    moveReverse(DOUBLE_SPEED);
   }
   // Safe All
-  else if (front > MAX && right > MAX && left > MAX) {
-    moveFoward(speed);
+  else if (safe_front && safe_right && safe_left) {
+    // debug LEDs off and full speed ahead
+    digitalWrite(RIGHT_LED, LOW);
+    digitalWrite(LEFT_LED, LOW);
+    moveFoward(SPEED);
   }
-  // Any Front, Right Caution, Left Safe
-  else if (right < MAX && right > MIN && left > MAX) {
-    turnLeft(speed*2);
-  }
-  // Any Front, Right Safe, Left Caution
-  else if (left < MAX && left > MIN && right > MAX) {
-    turnRight(speed*2);
-  }
-  // Any Front, Right Caution, Left Caution
-  else if (left < MAX && left > MIN && right < MAX) {
-    moveReverse(speed*2);
+  // Caution All
+  else if (caution_front && caution_right && caution_left) {
+    // debug LEDs on and back up normal speed
+    digitalWrite(RIGHT_LED, HIGH);
+    digitalWrite(LEFT_LED, HIGH);
+    moveReverse(SPEED);
   }
   // Caution Front, Right Safe, Left Safe
-  else {
-    // pick longest safe path of left or right
+  else if (caution_front && safe_right && safe_left) {
+    // stop and pick longest safe path of left or right
+    stop();
     if (left > right) {
-      turnLeft(speed*2);
+      turnLeft(DOUBLE_SPEED);
     }
     else {
-      turnRight(speed*2);
+      turnRight(DOUBLE_SPEED);
     }
-
+  }
+  // Safe Front, Right Caution, Left Caution
+  else if (safe_front && caution_left && caution_right) {
+    // debug lights on and back up normal speed
+    digitalWrite(RIGHT_LED, HIGH);
+    digitalWrite(LEFT_LED, HIGH);
+    moveReverse(SPEED);
+  }
+  // Any Front, Right Caution, Left Safe
+  else if (caution_right && safe_left) {
+    // turn on right LED and turn left
+    digitalWrite(RIGHT_LED, HIGH);
+    digitalWrite(LEFT_LED, LOW);
+    turnLeft(DOUBLE_SPEED);
+  }
+  // Any Front, Right Safe, Left Caution
+  else if (caution_left && safe_right) {
+    // turn on left LED and turn right
+    digitalWrite(RIGHT_LED, LOW);
+    digitalWrite(LEFT_LED, HIGH);
+    turnRight(DOUBLE_SPEED);
+  }
+  // Unexpected condition
+  else {
+    // stop robot and blink debug leds 5 times
+    stop();
+    for (int i = 0; i < 5; i++) {
+      blink_leds(RIGHT_LED, LEFT_LED, 100);
+    }    
   }
 }
 
@@ -181,5 +232,3 @@ void blink_leds(int led1, int led2, int dtime) {
   digitalWrite(led2, LOW);
   delay(dtime);
 }
-
-
