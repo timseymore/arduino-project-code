@@ -13,7 +13,10 @@
 #define LEFT_LED 1
 #define RIGHT_LED 0
 
-// Distance bounds
+// Caution Distance bounds
+//  - any distance greater than max is considered Safe
+//  - any distance less than min is considered Danger
+//  - any distance within bounds (inclusive) is considered Caution
 #define MAX 25
 #define MIN 10
 
