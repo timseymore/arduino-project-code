@@ -5,12 +5,12 @@
 //  - any distance within bounds (inclusive) is considered Caution
 //  - any distance less than min is considered Danger
 //  - any distance greater than max is considered Safe
-#define MIN 10
-#define MAX 25
+#define MIN 15
+#define MAX 30
 
 // Set robot movement speed
 // NOTE: positive integer up to 127, for double speed to be no greater than 255
-#define SPEED 127
+#define SPEED 90
 #define DOUBLE_SPEED SPEED*2  
 
 // SR04 Sensors
