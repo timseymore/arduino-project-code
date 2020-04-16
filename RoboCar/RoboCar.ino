@@ -14,8 +14,8 @@
 #define RIGHT_LED 0
 
 // Distance bounds
-#define MAX 40
-#define MIN 20
+#define MAX 25
+#define MIN 10
 
 // Motors
 
@@ -62,7 +62,7 @@ void setup() {
   
   // blink leds 10 times to indicate start up
   for (int i = 0; i < 10; i++) {
-    blink_leds(RIGHT_LED, LEFT_LED, 1000);
+    blink_leds(RIGHT_LED, LEFT_LED, 250);
   }
   
 }
