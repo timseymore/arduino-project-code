@@ -28,8 +28,8 @@
 #define ECHO_PIN_LEFT 6
 
 // LEDs
-#define LEFT_LED 1
-#define RIGHT_LED 0
+#define LEFT_LED 22
+#define RIGHT_LED 23
 
 // Motors
 

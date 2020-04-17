@@ -1,5 +1,6 @@
 {
-    "port": "COM5",
-    "board": "arduino:avr:uno",
-    "sketch": "RoboCar\\RoboCar.ino"
+    "port": "COM4",
+    "board": "arduino:avr:mega",
+    "sketch": "RoboCar\\RoboCar.ino",
+    "configuration": "cpu=atmega2560"
 }
