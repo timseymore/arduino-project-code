@@ -83,6 +83,9 @@ class Motor {
     }
 
     void init() {
+      pinMode(en, OUTPUT);
+      pinMode(in1, OUTPUT);
+      pinMode(in2, OUTPUT);
       stop();
     }
 
@@ -100,10 +103,9 @@ class Motor {
 
     void reverse(int speed) {
       analogWrite(en, speed);
-      digitalWrite(in1, LOW);
-      digitalWrite(in2, HIGH);  
+      digitalWrite(in1, HIGH);
+      digitalWrite(in2, LOW);  
     }
-
 
 };
 
@@ -112,12 +114,22 @@ class Robot {
     SR04 front_sensor;
     SR04 right_sensor;
     SR04 left_sensor;
+    Led right_led;
+    Led left_led;
+    Motor right_motor;
+    Motor left_motor;
 
   public:
-    Robot(SR04& front_sensor, SR04& right_sensor, SR04& left_sensor)
+    Robot(SR04& front_sensor, SR04& right_sensor, SR04& left_sensor,
+           Led& right_led, Led& left_led,
+           Motor& right_motor, Motor& left_motor)
     : front_sensor(front_sensor)
     , right_sensor(right_sensor)
     , left_sensor(left_sensor)
+    , right_led(right_led)
+    , left_led(left_led)
+    , right_motor(right_motor)
+    , left_motor(left_motor)
      {      
       init();
     }
@@ -141,10 +153,12 @@ Led right_led(RIGHT_LED);
 Led left_led(LEFT_LED);
 
 // Create Motor objects
-
+Motor motor_a(EN_A, IN1, IN2);
+Motor motor_b(EN_B, IN3, IN4);
 
 // Create robot object
-Robot robot(front_sensor, right_sensor, left_sensor);
+Robot robot(front_sensor, right_sensor, left_sensor,
+            right_led, left_led, motor_b, motor_a);
 
 // Distance variables
 long front_distance;
@@ -155,16 +169,16 @@ long left_distance;
 
 void setup() {
 
-  pinMode(EN_A, OUTPUT);
-  pinMode(EN_B, OUTPUT);
-  pinMode(IN1, OUTPUT);
-  pinMode(IN2, OUTPUT);
-  pinMode(IN3, OUTPUT);
-  pinMode(IN4, OUTPUT);
-  pinMode(RIGHT_LED, OUTPUT);
-  pinMode(LEFT_LED, OUTPUT);
-  digitalWrite(RIGHT_LED, LOW);
-  digitalWrite(LEFT_LED, LOW);
+  // pinMode(EN_A, OUTPUT);
+  // pinMode(EN_B, OUTPUT);
+  // pinMode(IN1, OUTPUT);
+  // pinMode(IN2, OUTPUT);
+  // pinMode(IN3, OUTPUT);
+  // pinMode(IN4, OUTPUT);
+  // pinMode(RIGHT_LED, OUTPUT);
+  // pinMode(LEFT_LED, OUTPUT);
+  // digitalWrite(RIGHT_LED, LOW);
+  // digitalWrite(LEFT_LED, LOW);
   
   // blink leds 10 times to indicate start up
   for (int i = 0; i < 10; i++) {
@@ -187,62 +201,32 @@ void loop() {
 
 // EFFECTS: Moves robot foward at given speed
 void moveFoward(int spd) {
-  // Motor Side A Foward
-  analogWrite(EN_A, spd);
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);  
-  // Motor Side B Foward
-  analogWrite(EN_B, spd);
-  digitalWrite(IN3, LOW); 
-  digitalWrite(IN4, HIGH);
+  motor_a.foward(spd);
+  motor_b.foward(spd);
 }
 
 // EFFECTS: Moves robot reverse at given speed
 void moveReverse(int spd) {
-  // Motor Side A Reverse
-  analogWrite(EN_A, spd);
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  // Motor Side B Reverse
-  analogWrite(EN_B, spd);
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
+  motor_a.reverse(spd);
+  motor_b.reverse(spd);
 }
 
 // EFFECTS: Turns robot left at input speed
 void turnLeft(int spd) {
-  // Motor Side A Reverse
-  analogWrite(EN_A, spd);
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);  
-  // Motor Side B Foward
-  analogWrite(EN_B, spd);
-  digitalWrite(IN3, LOW); 
-  digitalWrite(IN4, HIGH);
+  motor_a.reverse(spd);
+  motor_b.foward(spd);
 }
 
 // EFFECTS: Turns robot right at input speed
 void turnRight(int spd) {
-  // Motor Side A Foward
-  analogWrite(EN_A, spd);
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);  
-  // Motor Side B Reverse
-  analogWrite(EN_B, spd);
-  digitalWrite(IN3, HIGH); 
-  digitalWrite(IN4, LOW);
+  motor_a.foward(spd);
+  motor_b.reverse(spd);
 }
 
 // EFFECTS: Stops robot 
 void stop() {
-  // Motor Side A Stop
-  analogWrite(EN_A, 0);
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);  
-  // Motor Side B Stop
-  analogWrite(EN_B, 0);
-  digitalWrite(IN3, LOW); 
-  digitalWrite(IN4, LOW);
+  motor_a.stop();
+  motor_b.stop();
 }
 
 // RETURNS: true if distance is in danger zone
