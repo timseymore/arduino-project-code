@@ -135,10 +135,33 @@ class Robot {
     }
 
     void init() {
-      // setup code goes here
+      stop();
     }
 
-    // methods go down here
+    void moveFoward(int speed) {
+      right_motor.foward(speed);
+      left_motor.foward(speed);
+    }
+
+    void moveReverse(int speed) {
+      right_motor.reverse(speed);
+      left_motor.reverse(speed);
+    }
+
+    void stop() {
+      right_motor.stop();
+      left_motor.stop();
+    }
+
+    turnRight(int speed) {
+      right_motor.reverse(speed);
+      left_motor.foward(speed);
+    }
+
+    turnLeft(int speed) {
+      right_motor.foward(speed);
+      left_motor.reverse(speed);
+    }
 
 };
 
@@ -187,36 +210,6 @@ void loop() {
 
 // Helper Functions
 
-// EFFECTS: Moves robot foward at given speed
-void moveFoward(int spd) {
-  motor_a.foward(spd);
-  motor_b.foward(spd);
-}
-
-// EFFECTS: Moves robot reverse at given speed
-void moveReverse(int spd) {
-  motor_a.reverse(spd);
-  motor_b.reverse(spd);
-}
-
-// EFFECTS: Turns robot left at input speed
-void turnLeft(int spd) {
-  motor_a.reverse(spd);
-  motor_b.foward(spd);
-}
-
-// EFFECTS: Turns robot right at input speed
-void turnRight(int spd) {
-  motor_a.foward(spd);
-  motor_b.reverse(spd);
-}
-
-// EFFECTS: Stops robot 
-void stop() {
-  motor_a.stop();
-  motor_b.stop();
-}
-
 // RETURNS: true if distance is in danger zone
 bool in_danger(int distance) {
   return distance < MIN;
@@ -237,34 +230,34 @@ void handle_object_distance(int front, int right, int left) {
   // Danger Any
   if (in_danger(front) || in_danger(right) || in_danger(left)) {
     // stop, debug LEDs on,  and back up double speed
-    stop();
+    robot.stop();
     right_led.on();
     left_led.on();   
-    moveReverse(DOUBLE_SPEED);
+    robot.moveReverse(DOUBLE_SPEED);
   }
   // Safe All
   else if (in_safe(front) && in_safe(right) && in_safe(left)) {
     // debug LEDs off and full speed ahead
     right_led.off();
     left_led.off();
-    moveFoward(SPEED);
+    robot.moveFoward(SPEED);
   }
   // Caution All
   else if (in_caution(front) && in_caution(right) && in_caution(left)) {
     // debug LEDs on and back up normal speed
     right_led.on();
     left_led.on();
-    moveReverse(SPEED);
+    robot.moveReverse(SPEED);
   }
   // Caution Front, Right Safe, Left Safe
   else if (in_caution(front) && in_safe(right) && in_safe(left)) {
     // stop and pick longest safe path of left or right
-    stop();
+    robot.stop();
     if (left > right) {
-      turnLeft(DOUBLE_SPEED);
+      robot.turnLeft(DOUBLE_SPEED);
     }
     else {
-      turnRight(DOUBLE_SPEED);
+      robot.turnRight(DOUBLE_SPEED);
     }
   }
   // Safe Front, Right Caution, Left Caution
@@ -272,26 +265,26 @@ void handle_object_distance(int front, int right, int left) {
     // debug lights on and back up normal speed
     right_led.on();
     left_led.on();
-    moveReverse(SPEED);
+    robot.moveReverse(SPEED);
   }
   // Any Front, Right Caution, Left Safe
   else if (in_caution(right) && in_safe(left)) {
     // turn on right LED and turn left
     right_led.on();
     left_led.off();
-    turnLeft(DOUBLE_SPEED);
+    robot.turnLeft(DOUBLE_SPEED);
   }
   // Any Front, Right Safe, Left Caution
   else if (in_caution(left) && in_safe(right)) {
     // turn on left LED and turn right
     right_led.off();
     left_led.on();
-    turnRight(DOUBLE_SPEED);
+    robot.turnRight(DOUBLE_SPEED);
   }
   // Unexpected condition
   else {
     // stop robot and blink debug leds 5 times
-    stop();
+    robot.stop();
     for (int i = 0; i < 5; i++) {
       blink_leds(right_led, left_led, 100);
     }    
