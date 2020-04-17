@@ -43,15 +43,115 @@
 #define IN3 5
 #define IN4 4
 
-// Distance variables
-long front_distance;
-long right_distance;
-long left_distance;
+// TODO: Define Classes
+class Led {
+  private:
+    int pin;
+  
+  public:
+    Led(int pin) {
+      this->pin = pin;
+      init();
+    }
+
+    void init() {
+      pinMode(pin, OUTPUT);
+      off();
+    }
+
+    void on() {
+      digitalWrite(pin, HIGH);
+    }
+
+    void off() {
+      digitalWrite(pin, LOW);
+    }
+};
+
+class Motor {
+  private:
+    int en;
+    int in1;
+    int in2;
+  
+  public:
+    Motor(int en, int in1, int in2) {
+      this->en = en;
+      this->in1 = in1;
+      this->in2 = in2;
+      init();
+    }
+
+    void init() {
+      stop();
+    }
+
+    void stop() {
+      analogWrite(en, 0);
+      digitalWrite(in1, LOW);
+      digitalWrite(in2, LOW);  
+    }
+
+    void foward(int speed) {
+      analogWrite(en, speed);
+      digitalWrite(in1, LOW);
+      digitalWrite(in2, HIGH);  
+    }
+
+    void reverse(int speed) {
+      analogWrite(en, speed);
+      digitalWrite(in1, LOW);
+      digitalWrite(in2, HIGH);  
+    }
+
+
+};
+
+class Robot {
+  private:
+    SR04 front_sensor;
+    SR04 right_sensor;
+    SR04 left_sensor;
+
+  public:
+    Robot(SR04& front_sensor, SR04& right_sensor, SR04& left_sensor)
+    : front_sensor(front_sensor)
+    , right_sensor(right_sensor)
+    , left_sensor(left_sensor)
+     {      
+      init();
+    }
+
+    void init() {
+      // setup code goes here
+    }
+
+    // methods go down here
+
+};
+
 
 // Create SR04 objects
 SR04 front_sensor = SR04(ECHO_PIN_CENTER, TRIG_PIN_CENTER);
 SR04 right_sensor = SR04(ECHO_PIN_RIGHT, TRIG_PIN_RIGHT);
 SR04 left_sensor = SR04(ECHO_PIN_LEFT, TRIG_PIN_LEFT);
+
+// Create LED objects
+Led right_led(RIGHT_LED);
+Led left_led(LEFT_LED);
+
+// Create Motor objects
+
+
+// Create robot object
+Robot robot(front_sensor, right_sensor, left_sensor);
+
+// Distance variables
+long front_distance;
+long right_distance;
+long left_distance;
+
+
 
 void setup() {
 
@@ -68,7 +168,7 @@ void setup() {
   
   // blink leds 10 times to indicate start up
   for (int i = 0; i < 10; i++) {
-    blink_leds(RIGHT_LED, LEFT_LED, 200);
+    blink_leds(right_led, left_led, 200);
   }  
 
 }
@@ -166,22 +266,22 @@ void handle_object_distance(int front, int right, int left) {
   if (in_danger(front) || in_danger(right) || in_danger(left)) {
     // stop, debug LEDs on,  and back up double speed
     stop();
-    digitalWrite(RIGHT_LED, HIGH);
-    digitalWrite(LEFT_LED, HIGH);    
+    right_led.on();
+    left_led.on();   
     moveReverse(DOUBLE_SPEED);
   }
   // Safe All
   else if (in_safe(front) && in_safe(right) && in_safe(left)) {
     // debug LEDs off and full speed ahead
-    digitalWrite(RIGHT_LED, LOW);
-    digitalWrite(LEFT_LED, LOW);
+    right_led.off();
+    left_led.off();
     moveFoward(SPEED);
   }
   // Caution All
   else if (in_caution(front) && in_caution(right) && in_caution(left)) {
     // debug LEDs on and back up normal speed
-    digitalWrite(RIGHT_LED, HIGH);
-    digitalWrite(LEFT_LED, HIGH);
+    right_led.on();
+    left_led.on();
     moveReverse(SPEED);
   }
   // Caution Front, Right Safe, Left Safe
@@ -198,22 +298,22 @@ void handle_object_distance(int front, int right, int left) {
   // Safe Front, Right Caution, Left Caution
   else if (in_safe(front) && in_caution(left) && in_caution(right)) {
     // debug lights on and back up normal speed
-    digitalWrite(RIGHT_LED, HIGH);
-    digitalWrite(LEFT_LED, HIGH);
+    right_led.on();
+    left_led.on();
     moveReverse(SPEED);
   }
   // Any Front, Right Caution, Left Safe
   else if (in_caution(right) && in_safe(left)) {
     // turn on right LED and turn left
-    digitalWrite(RIGHT_LED, HIGH);
-    digitalWrite(LEFT_LED, LOW);
+    right_led.on();
+    left_led.off();
     turnLeft(DOUBLE_SPEED);
   }
   // Any Front, Right Safe, Left Caution
   else if (in_caution(left) && in_safe(right)) {
     // turn on left LED and turn right
-    digitalWrite(RIGHT_LED, LOW);
-    digitalWrite(LEFT_LED, HIGH);
+    right_led.off();
+    left_led.on();
     turnRight(DOUBLE_SPEED);
   }
   // Unexpected condition
@@ -221,23 +321,23 @@ void handle_object_distance(int front, int right, int left) {
     // stop robot and blink debug leds 5 times
     stop();
     for (int i = 0; i < 5; i++) {
-      blink_leds(RIGHT_LED, LEFT_LED, 100);
+      blink_leds(right_led, left_led, 100);
     }    
   }
 }
 
-void blink_led(int led, int dtime) {
-  digitalWrite(led, HIGH);
+void blink_led(Led led, int dtime) {
+  led.on();
   delay(dtime);
-  digitalWrite(led, LOW);
+  led.off();
   delay(dtime);
 }
 
-void blink_leds(int led1, int led2, int dtime) {
-  digitalWrite(led1, HIGH);
-  digitalWrite(led2, HIGH);
+void blink_leds(Led led1, Led led2, int dtime) {
+  led1.on();
+  led2.on();
   delay(dtime);
-  digitalWrite(led1, LOW);
-  digitalWrite(led2, LOW);
+  led1.off();
+  led2.off();
   delay(dtime);
 }
