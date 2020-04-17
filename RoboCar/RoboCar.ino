@@ -166,19 +166,7 @@ long right_distance;
 long left_distance;
 
 
-
 void setup() {
-
-  // pinMode(EN_A, OUTPUT);
-  // pinMode(EN_B, OUTPUT);
-  // pinMode(IN1, OUTPUT);
-  // pinMode(IN2, OUTPUT);
-  // pinMode(IN3, OUTPUT);
-  // pinMode(IN4, OUTPUT);
-  // pinMode(RIGHT_LED, OUTPUT);
-  // pinMode(LEFT_LED, OUTPUT);
-  // digitalWrite(RIGHT_LED, LOW);
-  // digitalWrite(LEFT_LED, LOW);
   
   // blink leds 10 times to indicate start up
   for (int i = 0; i < 10; i++) {
