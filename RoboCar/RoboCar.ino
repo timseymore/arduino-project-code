@@ -188,91 +188,91 @@ class Robot {
       return this->front_sensor.Distance();
     }
 
-        int get_right_distance() {
+    int get_right_distance() {
       return this->right_sensor.Distance();
     }
 
-        int get_left_distance() {
+    int get_left_distance() {
       return this->left_sensor.Distance();
     }
 
-  void blink_leds(int dtime) {
-    this->right_led.on();
-    this->left_led.on();
-    delay(dtime);
-    this->right_led.off();
-    this->left_led.off();
-    delay(dtime);
-  }
-
-  // EFFECTS: set direction based on distance to object
-  void handle_object_distance() {
-    int front = get_left_distance();
-    int right = get_left_distance();
-    int left = get_left_distance();
-    // Danger Any
-    if (in_danger(front) || in_danger(right) || in_danger(left)) {
-      // stop, debug LEDs on,  and back up double speed
-      stop();
-      this->right_led.on();
-      this->left_led.on();   
-      moveReverse(DOUBLE_SPEED);
-    }
-    // Safe All
-    else if (in_safe(front) && in_safe(right) && in_safe(left)) {
-      // debug LEDs off and full speed ahead
-      this->right_led.off();
-      this->left_led.off();
-      moveFoward(SPEED);
-    }
-    // Caution All
-    else if (in_caution(front) && in_caution(right) && in_caution(left)) {
-      // debug LEDs on and back up normal speed
+    void blink_leds(int dtime) {
       this->right_led.on();
       this->left_led.on();
-      moveReverse(SPEED);
+      delay(dtime);
+      this->right_led.off();
+      this->left_led.off();
+      delay(dtime);
     }
-    // Caution Front, Right Safe, Left Safe
-    else if (in_caution(front) && in_safe(right) && in_safe(left)) {
-      // stop and pick longest safe path of left or right
-      stop();
-      if (left > right) {
+
+    // EFFECTS: set direction based on distance to object
+    void handle_object_distance() {
+      int front = get_left_distance();
+      int right = get_left_distance();
+      int left = get_left_distance();
+      // Danger Any
+      if (in_danger(front) || in_danger(right) || in_danger(left)) {
+        // stop, debug LEDs on,  and back up double speed
+        stop();
+        this->right_led.on();
+        this->left_led.on();   
+        moveReverse(DOUBLE_SPEED);
+      }
+      // Safe All
+      else if (in_safe(front) && in_safe(right) && in_safe(left)) {
+        // debug LEDs off and full speed ahead
+        this->right_led.off();
+        this->left_led.off();
+        moveFoward(SPEED);
+      }
+      // Caution All
+      else if (in_caution(front) && in_caution(right) && in_caution(left)) {
+        // debug LEDs on and back up normal speed
+        this->right_led.on();
+        this->left_led.on();
+        moveReverse(SPEED);
+      }
+      // Caution Front, Right Safe, Left Safe
+      else if (in_caution(front) && in_safe(right) && in_safe(left)) {
+        // stop and pick longest safe path of left or right
+        stop();
+        if (left > right) {
+          turnLeft(DOUBLE_SPEED);
+        }
+        else {
+          turnRight(DOUBLE_SPEED);
+        }
+      }
+      // Safe Front, Right Caution, Left Caution
+      else if (in_safe(front) && in_caution(left) && in_caution(right)) {
+        // debug lights on and back up normal speed
+        this->right_led.on();
+        this->left_led.on();
+        moveReverse(SPEED);
+      }
+      // Any Front, Right Caution, Left Safe
+      else if (in_caution(right) && in_safe(left)) {
+        // turn on right LED and turn left
+        this->right_led.on();
+        this->left_led.off();
         turnLeft(DOUBLE_SPEED);
       }
-      else {
+      // Any Front, Right Safe, Left Caution
+      else if (in_caution(left) && in_safe(right)) {
+        // turn on left LED and turn right
+        this->right_led.off();
+        this->left_led.on();
         turnRight(DOUBLE_SPEED);
       }
+      // Unexpected condition
+      else {
+        // stop robot and blink debug leds 5 times
+        stop();
+        for (int i = 0; i < 5; i++) {
+          blink_leds(100);
+        }    
+      }
     }
-    // Safe Front, Right Caution, Left Caution
-    else if (in_safe(front) && in_caution(left) && in_caution(right)) {
-      // debug lights on and back up normal speed
-      this->right_led.on();
-      this->left_led.on();
-      moveReverse(SPEED);
-    }
-    // Any Front, Right Caution, Left Safe
-    else if (in_caution(right) && in_safe(left)) {
-      // turn on right LED and turn left
-      this->right_led.on();
-      this->left_led.off();
-      turnLeft(DOUBLE_SPEED);
-    }
-    // Any Front, Right Safe, Left Caution
-    else if (in_caution(left) && in_safe(right)) {
-      // turn on left LED and turn right
-      this->right_led.off();
-      this->left_led.on();
-      turnRight(DOUBLE_SPEED);
-    }
-    // Unexpected condition
-    else {
-      // stop robot and blink debug leds 5 times
-      stop();
-      for (int i = 0; i < 5; i++) {
-        blink_leds(100);
-      }    
-    }
-  }
 
 };
 
