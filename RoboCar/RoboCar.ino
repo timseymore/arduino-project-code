@@ -16,7 +16,7 @@
 
 // Set robot movement speed
 // NOTE: positive integer up to 127, for double speed to be no greater than 255
-#define SPEED 90
+#define SPEED 125
 #define DOUBLE_SPEED SPEED*2  
 
 // SR04 Sensors
