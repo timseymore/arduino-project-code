@@ -10,12 +10,31 @@ const int rs = 2, en = 3, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 // Define sensor pins
-#define trigPin 10
-#define echoPin 9
-#define pirPin 8
-#define detectedLED 11
-#define readyLED 12
-#define waitLED 13
+#define TRIG_PIN 10
+#define ECHO_PIN 9
+#define PIR_PIN 8
+#define DETECTED_LED 11
+#define READY_LED 12
+#define WAIT_LED 13
+
+// TODO: Implement OOP structure
+class System {
+  private:
+    LiquidCrystal lcd;
+
+  public:
+    System (LiquidCrystal lcd)
+    :lcd(lcd)
+    {
+      init();
+    };
+
+    void init () {
+      lcd.begin(16, 2);
+      printWarmupMessage();
+    }
+
+}
 
 // Define variables
 int pirValue;
@@ -36,16 +55,16 @@ void setup()
   timesDetected = 0;
   shortestDistance = 0; // set for a default
 
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-  pinMode(detectedLED, OUTPUT);
-  pinMode(readyLED, OUTPUT);
-  pinMode(waitLED, OUTPUT);
-  pinMode(pirPin, INPUT);
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(DETECTED_LED, OUTPUT);
+  pinMode(READY_LED, OUTPUT);
+  pinMode(WAIT_LED, OUTPUT);
+  pinMode(PIR_PIN, INPUT);
 
-  digitalWrite(detectedLED, LOW);
-  digitalWrite(readyLED, LOW);
-  digitalWrite(waitLED, HIGH); 
+  digitalWrite(DETECTED_LED, LOW);
+  digitalWrite(READY_LED, LOW);
+  digitalWrite(WAIT_LED, HIGH); 
 
   lcd.begin(16, 2);
   printWarmupMessage();
@@ -54,7 +73,7 @@ void setup()
 void loop()
 {  
   // Get sensor data
-  pirValue = digitalRead(pirPin);
+  pirValue = digitalRead(PIR_PIN);
   distance = calculateDistance();
 
   // check for and handle motion events
@@ -142,8 +161,8 @@ void handleMotionDetected(float current) {
     lcd.print("cm");
   }    
   // Display Triggered LED
-  digitalWrite(readyLED, LOW);
-  digitalWrite(detectedLED, HIGH);
+  digitalWrite(READY_LED, LOW);
+  digitalWrite(DETECTED_LED, HIGH);
   // Display triggered state for 3 seconds
   delay(3000);
 }
@@ -151,13 +170,13 @@ void handleMotionDetected(float current) {
 // EFFECTS: returns the calculated distance in cm from HC-SR04 sensor
 float calculateDistance() {
   // Write a pulse to the HC-SR04 Trigger Pin  
-  digitalWrite(trigPin, LOW);
+  digitalWrite(TRIG_PIN, LOW);
   delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
+  digitalWrite(TRIG_PIN, HIGH);
   delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);  
+  digitalWrite(TRIG_PIN, LOW);  
   // Measure the response from the HC-SR04 Echo Pin 
-  float duration = pulseIn(echoPin, HIGH);  
+  float duration = pulseIn(ECHO_PIN, HIGH);  
   // Determine distance from duration
   // Using 343 metres per second as speed of sound  
   return (duration / 2) * 0.0343;
@@ -166,9 +185,9 @@ float calculateDistance() {
 // EFFECTS: displays wait led and prints rearm message to screen for 6 seconds
 void rearmSystem() {
   // Reset LEDs to wait position      
-  digitalWrite(detectedLED, LOW);
-  digitalWrite(readyLED, LOW);
-  digitalWrite(waitLED, HIGH);
+  digitalWrite(DETECTED_LED, LOW);
+  digitalWrite(READY_LED, LOW);
+  digitalWrite(WAIT_LED, HIGH);
   // Print message to display
   lcd.setCursor(0, 0);
   lcd.clear();
@@ -180,8 +199,8 @@ void rearmSystem() {
 
 void systemArmedState() {
   // Set LEDs to ready position
-  digitalWrite(waitLED, LOW);
-  digitalWrite(readyLED, HIGH);
+  digitalWrite(WAIT_LED, LOW);
+  digitalWrite(READY_LED, HIGH);
   // Print ready screen to display
   lcd.setCursor(0, 0);
   
