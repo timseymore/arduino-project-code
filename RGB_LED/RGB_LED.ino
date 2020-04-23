@@ -15,7 +15,7 @@ int greenValue;
 int blueValue;
 
 
-void setup() {
+void setup () {
     pinMode(RED, OUTPUT);
     pinMode(GREEN, OUTPUT);
     pinMode(BLUE, OUTPUT);
@@ -24,25 +24,19 @@ void setup() {
     digitalWrite(BLUE, LOW);
 }
 
-void loop() {    
+void loop () {    
 
-    redValue = 255; 
-    greenValue = 0;
-    blueValue = 0;
+    one_full (redValue. greenValue, blueValue);
 
     // fade out red bring green full when i=255
     fade (redValue, greenValue, RED, GREEN);
 
-    redValue = 0;
-    greenValue = 255;
-    blueValue = 0;
+    one_full (greenValue, redValue, blueValue);
 
     // fade out green bring blue full when i=255
     fade (greenValue, blueValue, GREEN, BLUE);
 
-    redValue = 0;
-    greenValue = 0;
-    blueValue = 255;
+    one_full (blueValue, redValue, greenValue);
 
     // fade out blue bring red full when i=255
     fade (blueValue, redValue, BLUE, RED);
@@ -61,3 +55,9 @@ void fade (int out_val, int in_val, int out_pin, int in_pin) {
 
 }
 
+
+void one_full (int on, int off1, int off2) {
+    analogWrite(on, 255);
+    analogWrite(off1, 0);
+    analogWrite(off2, 0);
+}
