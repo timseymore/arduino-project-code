@@ -3,6 +3,7 @@
  */
 
 #include <LiquidCrystal.h>
+#include <SR04.h>
 
 
 // Define pins for LCD display
@@ -17,24 +18,52 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 #define READY_LED 12
 #define WAIT_LED 13
 
-// TODO: Implement OOP structure
+// TODO: Implement OOP
 class System {
   private:
     LiquidCrystal lcd;
+    SR04 sr04;
+    int pirValue;
+    int motionDetected;
+    float distance;
+    int timesDetected;
+    float shortestDistance;
+    float lastDistance;
+
 
   public:
-    System (LiquidCrystal lcd)
+    System (LiquidCrystal& lcd, SR04& sr04)
     :lcd(lcd)
+    ,sr04(sr04)
     {
       init();
     };
 
     void init () {
+      motionDetected = 0;
+      timesDetected = 0;
+      shortestDistance = 0; // set for a default
+
+      pinMode(TRIG_PIN, OUTPUT);
+      pinMode(ECHO_PIN, INPUT);
+      pinMode(DETECTED_LED, OUTPUT);
+      pinMode(READY_LED, OUTPUT);
+      pinMode(WAIT_LED, OUTPUT);
+      pinMode(PIR_PIN, INPUT);
+
+      digitalWrite(DETECTED_LED, LOW);
+      digitalWrite(READY_LED, LOW);
+      digitalWrite(WAIT_LED, HIGH); 
+
       lcd.begin(16, 2);
       printWarmupMessage();
     }
 
-}
+};
+
+
+SR04 sr04(ECHO_PIN, TRIG_PIN);
+System system(lcd, sr04);
 
 // Define variables
 int pirValue;
@@ -51,23 +80,21 @@ float lastDistance;
 
 void setup()
 {
-  motionDetected = 0;
-  timesDetected = 0;
-  shortestDistance = 0; // set for a default
+  // motionDetected = 0;
+  // timesDetected = 0;
+  // shortestDistance = 0; // set for a default
 
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT);
-  pinMode(DETECTED_LED, OUTPUT);
-  pinMode(READY_LED, OUTPUT);
-  pinMode(WAIT_LED, OUTPUT);
-  pinMode(PIR_PIN, INPUT);
+  // pinMode(TRIG_PIN, OUTPUT);
+  // pinMode(ECHO_PIN, INPUT);
+  // pinMode(DETECTED_LED, OUTPUT);
+  // pinMode(READY_LED, OUTPUT);
+  // pinMode(WAIT_LED, OUTPUT);
+  // pinMode(PIR_PIN, INPUT);
 
-  digitalWrite(DETECTED_LED, LOW);
-  digitalWrite(READY_LED, LOW);
-  digitalWrite(WAIT_LED, HIGH); 
+  // digitalWrite(DETECTED_LED, LOW);
+  // digitalWrite(READY_LED, LOW);
+  // digitalWrite(WAIT_LED, HIGH); 
 
-  lcd.begin(16, 2);
-  printWarmupMessage();
 }
 
 void loop()
