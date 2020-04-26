@@ -212,7 +212,7 @@ class Robot {
       int left = get_left_distance();
       // Danger Any
       if (in_danger(front) || in_danger(right) || in_danger(left)) {
-        // stop, debug LEDs on,  and back up double speed
+        // stop, debug LEDs on, and back up double speed
         stop();
         this->right_led.on();
         this->left_led.on();   
