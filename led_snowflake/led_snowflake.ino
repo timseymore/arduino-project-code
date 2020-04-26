@@ -13,7 +13,7 @@ int leds[NUMSTRIPS][NUMLEDS] = {
   {22, 24, 26, 28, 30},  // Strip 1
   {23, 25, 27, 29, 31},  // Strip 2
   {42, 46, 48, 50, 52},  // Strip 3
-  {45, 47, 49, 51, 53}  // Strip 4
+  {45, 47, 49, 51, 53}   // Strip 4
 
 };
 
@@ -32,13 +32,13 @@ void setup() {
 
 void loop() {
 
-//  allFull(leds);
+  allFull(leds);
 
-//  sparkleAll(leds);
+  // sparkleAll(leds);
 
-// chaser(leds, 25);
+  // chaser(leds, 25);
 
-//  chaseBack(leds, 70);
+  // chaseBack(leds, 70);
 
 }
 
