@@ -40,12 +40,12 @@ class System {
     };
 
     void init () {
-      motionDetected = 0;
+      motionDetected = 0; // 0 for false, 1 for true
       timesDetected = 0;
       shortestDistance = 0; // set for a default
 
-      pinMode(TRIG_PIN, OUTPUT);
-      pinMode(ECHO_PIN, INPUT);
+      // pinMode(TRIG_PIN, OUTPUT);
+      // pinMode(ECHO_PIN, INPUT);
       pinMode(DETECTED_LED, OUTPUT);
       pinMode(READY_LED, OUTPUT);
       pinMode(WAIT_LED, OUTPUT);
@@ -101,7 +101,7 @@ void loop()
 {  
   // Get sensor data
   pirValue = digitalRead(PIR_PIN);
-  distance = calculateDistance();
+  distance = sr04.distance;
 
   // check for and handle motion events
   if (pirValue == 1) {    
@@ -118,7 +118,7 @@ void loop()
     rearmSystem();
     timesDetected++;
     motionDetected = 0;
-  } 
+  }
 
   // Return to ready state
   systemArmedState();
@@ -194,20 +194,20 @@ void handleMotionDetected(float current) {
   delay(3000);
 }
 
-// EFFECTS: returns the calculated distance in cm from HC-SR04 sensor
-float calculateDistance() {
-  // Write a pulse to the HC-SR04 Trigger Pin  
-  digitalWrite(TRIG_PIN, LOW);
-  delayMicroseconds(2);
-  digitalWrite(TRIG_PIN, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(TRIG_PIN, LOW);  
-  // Measure the response from the HC-SR04 Echo Pin 
-  float duration = pulseIn(ECHO_PIN, HIGH);  
-  // Determine distance from duration
-  // Using 343 metres per second as speed of sound  
-  return (duration / 2) * 0.0343;
-}
+// // EFFECTS: returns the calculated distance in cm from HC-SR04 sensor
+// float calculateDistance() {
+//   // Write a pulse to the HC-SR04 Trigger Pin  
+//   digitalWrite(TRIG_PIN, LOW);
+//   delayMicroseconds(2);
+//   digitalWrite(TRIG_PIN, HIGH);
+//   delayMicroseconds(10);
+//   digitalWrite(TRIG_PIN, LOW);  
+//   // Measure the response from the HC-SR04 Echo Pin 
+//   float duration = pulseIn(ECHO_PIN, HIGH);  
+//   // Determine distance from duration
+//   // Using 343 metres per second as speed of sound  
+//   return (duration / 2) * 0.0343;
+// }
 
 // EFFECTS: displays wait led and prints rearm message to screen for 6 seconds
 void rearmSystem() {
