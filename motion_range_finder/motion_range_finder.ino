@@ -44,8 +44,6 @@ class System {
       timesDetected = 0;
       shortestDistance = 0; // set for a default
 
-      // pinMode(TRIG_PIN, OUTPUT);
-      // pinMode(ECHO_PIN, INPUT);
       pinMode(DETECTED_LED, OUTPUT);
       pinMode(READY_LED, OUTPUT);
       pinMode(WAIT_LED, OUTPUT);
@@ -59,6 +57,31 @@ class System {
       printWarmupMessage();
     }
 
+  void run() {
+      // Get sensor data
+      pirValue = digitalRead(PIR_PIN);
+      distance = sr04.distance;
+
+      // check for and handle motion events
+      if (pirValue == 1) {    
+        
+        lastDistance = distance;
+        if (shortestDistance == 0 || distance < shortestDistance) {
+          shortestDistance = distance;
+        } 
+        handleMotionDetected(distance);    
+        motionDetected = 1;
+      }
+
+      if (motionDetected == 1) {
+        rearmSystem();
+        timesDetected++;
+        motionDetected = 0;
+      }
+
+      // Return to ready state
+      systemArmedState();
+      }
 };
 
 
@@ -78,52 +101,9 @@ float lastDistance;
 // Setup And Run //
 ///////////////////
 
-void setup()
-{
-  // motionDetected = 0;
-  // timesDetected = 0;
-  // shortestDistance = 0; // set for a default
+void setup() {}
 
-  // pinMode(TRIG_PIN, OUTPUT);
-  // pinMode(ECHO_PIN, INPUT);
-  // pinMode(DETECTED_LED, OUTPUT);
-  // pinMode(READY_LED, OUTPUT);
-  // pinMode(WAIT_LED, OUTPUT);
-  // pinMode(PIR_PIN, INPUT);
-
-  // digitalWrite(DETECTED_LED, LOW);
-  // digitalWrite(READY_LED, LOW);
-  // digitalWrite(WAIT_LED, HIGH); 
-
-}
-
-void loop()
-{  
-  // Get sensor data
-  pirValue = digitalRead(PIR_PIN);
-  distance = sr04.distance;
-
-  // check for and handle motion events
-  if (pirValue == 1) {    
-    
-    lastDistance = distance;
-    if (shortestDistance == 0 || distance < shortestDistance) {
-      shortestDistance = distance;
-    } 
-    handleMotionDetected(distance);    
-    motionDetected = 1;
-  }
-
-  if (motionDetected == 1) {
-    rearmSystem();
-    timesDetected++;
-    motionDetected = 0;
-  }
-
-  // Return to ready state
-  systemArmedState();
-
-}
+void loop() { system.run(); }
 
 
 //////////////////////
