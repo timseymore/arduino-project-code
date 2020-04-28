@@ -30,7 +30,6 @@ class System {
     float shortestDistance;
     float lastDistance;
 
-
   public:
     System (LiquidCrystal& lcd, SR04& sr04)
     :lcd(lcd)
@@ -81,7 +80,30 @@ class System {
 
       // Return to ready state
       systemArmedState();
+    }
+
+    void printWarmupMessage() {      
+      lcd.setCursor(2, 0); // center the text, 2 spaces from the left edge
+      lcd.print("Motion Finder");
+      delay(10000);
+      lcd.clear();
+
+      int count = 0;
+      for (int i = 0; i < 10; i++) {
+        lcd.setCursor(0, 0);
+        lcd.print("Warming up");
+        lcd.setCursor(10, 0);
+        lcd.print(getDots(count));
+        delay(5000);
+        lcd.clear();
+        count++;
+        // keep count between 0 and 3 inclusive
+        if (count > 3) {
+          count = 0;
+        }        
       }
+    }
+    
 };
 
 
@@ -110,27 +132,8 @@ void loop() { system.run(); }
 // Helper Functions //
 //////////////////////
 
-void printWarmupMessage() {
-  lcd.setCursor(2, 0); // center the text, 2 spaces from the left edge
-  lcd.print("Motion Finder");
-  delay(10000);
-  lcd.clear();
 
-  int count = 0;
-  for (int i = 0; i < 10; i++) {
-    lcd.setCursor(0, 0);
-    lcd.print("Warming up");
-    lcd.setCursor(10, 0);
-    lcd.print(getDots(count));
-    delay(5000);
-    lcd.clear();
-    count++;
-    // keep count between 0 and 3 inclusive
-    if (count > 3) {
-      count = 0;
-    }        
-  }
-}
+// TODO: refactor all helpers into System class
 
 // EFFECTS: returns string of dots according to value of c
 String getDots(int c) {
