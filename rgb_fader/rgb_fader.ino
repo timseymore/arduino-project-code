@@ -19,22 +19,22 @@ void setup () {
 void loop () {    
 
     // start loop with full red
-    one_full (RED, GREEN, BLUE);
+    one_full(RED, GREEN, BLUE);
 
     // fade red to green
-    fade (RED, GREEN);
+    fade(RED, GREEN);
 
     // ensure full green only
-    one_full (GREEN, RED, BLUE);
+    one_full(GREEN, RED, BLUE);
 
     // fade green to blue
-    fade (GREEN, BLUE);
+    fade(GREEN, BLUE);
 
     // ensure blue full only
-    one_full (BLUE, RED, GREEN);
+    one_full(BLUE, RED, GREEN);
 
     // fade blue to red
-    fade (BLUE, RED);
+    fade(BLUE, RED);
 
 }
 
@@ -44,7 +44,7 @@ void loop () {
 void fade (int out_pin, int in_pin) {
     int out_val = 255;
     int in_val = 0;
-    for(int i = 0; i < 255; i += 1) {
+    for (int i = 0; i < 255; i += 1) {
         out_val -= 1;
         in_val += 1;
         analogWrite(out_pin, out_val);
