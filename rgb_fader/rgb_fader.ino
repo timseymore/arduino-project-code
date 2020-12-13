@@ -1,9 +1,11 @@
 /*
     RGB LED Fader
+
+    Fades an RGB LED between red, green, and blue
 */
 
 
-// LED Pins
+// Define LED Pins
 #define BLUE 6
 #define GREEN 5
 #define RED 3
@@ -14,34 +16,20 @@ void setup () {
     pinMode(RED, OUTPUT);
     pinMode(GREEN, OUTPUT);
     pinMode(BLUE, OUTPUT);
+
+    one_full(RED, GREEN, BLUE);    
 }
 
 void loop () {    
-
-    // start loop with full red
-    one_full(RED, GREEN, BLUE);
-
-    // fade red to green
-    fade(RED, GREEN);
-
-    // ensure full green only
-    one_full(GREEN, RED, BLUE);
-
-    // fade green to blue
-    fade(GREEN, BLUE);
-
-    // ensure blue full only
-    one_full(BLUE, RED, GREEN);
-
-    // fade blue to red
-    fade(BLUE, RED);
-
+    fade_between(RED, GREEN);
+    fade_between(GREEN, BLUE);
+    fade_between(BLUE, RED);
 }
 
 // Fade out_val from full to off while bringing in_val to full from off
 // - out_pin : pin number for led to fade out
 // - in_pin : pin number for led to fade in
-void fade (int out_pin, int in_pin) {
+void fade_between (int out_pin, int in_pin) {
     int out_val = 255;
     int in_val = 0;
     for (int i = 0; i < 255; i += 1) {
