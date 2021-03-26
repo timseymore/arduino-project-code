@@ -1,9 +1,9 @@
 /*
-  Blink
+   My Blink
 
 */
 
-const int DELAY_TIME = 500;
+#define DELAY_TIME 500
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
